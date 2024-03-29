@@ -2,29 +2,33 @@ from flask import Flask, request, jsonify
 from sklearn.preprocessing import StandardScaler
 import joblib
 import pandas as pd
+# //-------------------------------------------------------
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
+from keras import models
+from keras import layers
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
+# --------------------------------------------------------
 app = Flask(__name__)
 
-model = joblib.load("model_svm_heartdeases.joblib")
+model = models.load_model("my_model.h5")
+# model = joblib.load("my_model.h5")
 @app.route('/')
 def home():
     return "Welcome to the Heart Disease Prediction API!"
 
 @app.route('/predict', methods=['POST'])
 def predict():
+
     try:
         data = request.get_json()
 
         if len(data['features']) != 13:
             return jsonify({'error': 'Invalid input format'}), 400
         t = [int(value) for value in data['features']]
-        # print(t)
-        raw_data = pd.read_csv(r"heart.csv")
+        print(t)
+        raw_data = pd.read_csv(r"data_heart.csv")
         df = pd.DataFrame([{
             'age': t[0],
             'sex': t[1],
@@ -49,18 +53,17 @@ def predict():
         columns_to_scale = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
         data[columns_to_scale] = standardScaler.fit_transform(data[columns_to_scale])
         # print(data.info())
-        bool_columns=['sex_0', 'sex_1', 'cp_0', 'cp_1', 'cp_2', 'cp_3',
-                      'fbs_0', 'fbs_1', 'restecg_0', 'restecg_1', 'restecg_2', 'exang_0',
-                      'exang_1', 'slope_0', 'slope_1', 'slope_2', 'ca_0', 'ca_1', 'ca_2', 'ca_3',
-                      'ca_4', 'thal_0', 'thal_1', 'thal_2', 'thal_3']
+        bool_columns = ['sex_0.0', 'sex_1.0', 'cp_0', 'cp_1', 'cp_2', 'cp_3',
+                        'fbs_0', 'fbs_1', 'restecg_0', 'restecg_1', 'restecg_2', 'exang_0',
+                        'exang_1', 'slope_0', 'slope_1', 'slope_2', 'ca_0', 'ca_1', 'ca_2', 'ca_3',
+                        'ca_4', 'thal_0', 'thal_1', 'thal_2', 'thal_3']
 
         data[bool_columns] = data[bool_columns].astype(int)
         X_test = data.drop('target', axis=1)
         X_test = X_test.iloc[[-1]]
-        # print(X_test.info())
-        prediction = int(model.predict(X_test)[0])
-
-        return jsonify({'prediction': prediction})
+        prediction = model.predict(X_test)
+        print(int(float(prediction[0,0])*10000))
+        return jsonify({'prediction': int(float(prediction[0,0])*10000)})
 
     except Exception as e:
         print(str(e))
