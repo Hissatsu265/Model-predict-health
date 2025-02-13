@@ -13,6 +13,10 @@ A comprehensive health monitoring system that combines embedded hardware, web ma
 - **Predictive Health Analysis**: Advanced machine learning models for health condition prediction
 - **Integrated System Architecture**: Seamless integration between hardware and software components
 
+## Demo
+
+[![Demo Video](https://img.youtube.com/vi/9TSAju2OHpI/1.jpg)](https://www.youtube.com/watch?v=9TSAju2OHpI)
+
 ## 🔧 System Components
 
 ### 1. Embedded Hardware
